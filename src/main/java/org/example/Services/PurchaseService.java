@@ -89,4 +89,30 @@ public class PurchaseService implements Service<Purchase> {
             return false;
         }
     }
+
+    public void removeProduct() {
+        List<Purchase> purchaseList = purchaseRepository.load();
+
+        if (purchaseList.isEmpty()) {
+            System.out.println("Список покупок пуст. Нечего удалять.");
+            return;
+        }
+
+        System.out.println("Выберите номер покупки для удаления:");
+        appHelperPurchase.printList(purchaseList);
+
+        try {
+            int index = Integer.parseInt(inputProvider.getInput()) - 1;
+
+            if (index >= 0 && index < purchaseList.size()) {
+                purchaseList.remove(index);
+                purchaseRepository.save(purchaseList);
+                System.out.println("Покупка успешно удалена.");
+            } else {
+                System.out.println("Некорректный номер покупки.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка: некорректный ввод числа.");
+        }
+    }
 }

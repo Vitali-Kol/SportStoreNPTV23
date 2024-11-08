@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Purchase implements Serializable {
+    private static final long serialVersionUID = 1L; // добавьте это поле
+
     private UUID id;
     private Client client;
     private SportEquipment sportEquipment;
@@ -60,5 +62,8 @@ public class Purchase implements Serializable {
                 client.getFirstname() + " " + client.getLastname(),
                 sportEquipment.getName(),
                 purchaseDate);
+    }
+
+    public void setDetails(String updatedDetails) {
     }
 }

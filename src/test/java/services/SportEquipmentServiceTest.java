@@ -1,4 +1,3 @@
-// SportEquipmentServiceTest.java
 package services;
 
 import org.example.Model.SportEquipment;
@@ -9,6 +8,7 @@ import org.example.interfaces.Input;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,16 +24,22 @@ public class SportEquipmentServiceTest {
     private FileRepository<SportEquipment> sportEquipmentRepositoryMock;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        // Создаем мок-объекты
         appHelperSportEquipmentMock = mock(AppHelper.class);
         inputProviderMock = mock(Input.class);
         sportEquipmentRepositoryMock = mock(FileRepository.class);
 
+        // Инициализируем сервис
         sportEquipmentService = new SportEquipmentService(
                 appHelperSportEquipmentMock,
-                inputProviderMock,
-                sportEquipmentRepositoryMock
+                inputProviderMock
         );
+
+        // Используем рефлексию для замены приватного поля sportEquipmentRepository на мок
+        Field repositoryField = SportEquipmentService.class.getDeclaredField("sportEquipmentRepository");
+        repositoryField.setAccessible(true);
+        repositoryField.set(sportEquipmentService, sportEquipmentRepositoryMock);
     }
 
     // Тест для метода add() - успешный случай
@@ -142,9 +148,15 @@ public class SportEquipmentServiceTest {
         UUID id123 = UUID.randomUUID();
         SportEquipment updatedEquipment = new SportEquipment();
         updatedEquipment.setId(id123);
+        updatedEquipment.setName("Updated Name");
+        updatedEquipment.setCategories(Arrays.asList("Category1", "Category2"));
+        updatedEquipment.setPrice(150.0);
 
         SportEquipment existingEquipment = new SportEquipment();
         existingEquipment.setId(id123);
+        existingEquipment.setName("Old Name");
+        existingEquipment.setCategories(Arrays.asList("Category1"));
+        existingEquipment.setPrice(100.0);
 
         List<SportEquipment> equipmentList = new ArrayList<>();
         equipmentList.add(existingEquipment);
@@ -269,8 +281,9 @@ public class SportEquipmentServiceTest {
     @Test
     public void testEditProductSuccess() {
         // Arrange
+        UUID equipmentId = UUID.randomUUID();
         SportEquipment equipment = new SportEquipment();
-        equipment.setId(UUID.randomUUID());
+        equipment.setId(equipmentId);
         equipment.setName("Old Name");
         equipment.setCategories(Arrays.asList("Category1"));
         equipment.setPrice(100.0);
@@ -337,8 +350,9 @@ public class SportEquipmentServiceTest {
     @Test
     public void testEditProductInvalidPriceInput() {
         // Arrange
+        UUID equipmentId = UUID.randomUUID();
         SportEquipment equipment = new SportEquipment();
-        equipment.setId(UUID.randomUUID());
+        equipment.setId(equipmentId);
         equipment.setName("Old Name");
         equipment.setCategories(Arrays.asList("Category1"));
         equipment.setPrice(100.0);

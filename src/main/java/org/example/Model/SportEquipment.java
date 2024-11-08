@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class SportEquipment implements Serializable {
+    private static final long serialVersionUID = 1L; // Добавьте это поле
+
     private UUID id;
     private String name;
     private List<String> categories = new ArrayList<>();
@@ -21,6 +23,9 @@ public class SportEquipment implements Serializable {
         this.name = name;
         this.categories = categories;
         this.price = price;
+    }
+
+    public <E> SportEquipment(UUID uuid, String футбольныйМяч, List<E> спорт, double v) {
     }
 
     public UUID getId() {
@@ -53,6 +58,24 @@ public class SportEquipment implements Serializable {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SportEquipment equipment = (SportEquipment) o;
+        return Double.compare(equipment.price, price) == 0 && id.equals(equipment.id) && name.equals(equipment.name) && Arrays.equals(categories.toArray(), equipment.categories.toArray());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + Arrays.hashCode(categories.toArray());
+        result = 31 * result + Double.hashCode(price);
+        return result;
     }
 
     @Override

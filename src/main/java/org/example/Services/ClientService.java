@@ -7,6 +7,7 @@ import org.example.interfaces.Input;
 import org.example.interfaces.FileRepository;
 import org.example.repository.FileRepositoryImpl;
 
+
 import java.util.List;
 
 public class ClientService implements Service<Client> {
@@ -14,10 +15,16 @@ public class ClientService implements Service<Client> {
     private final Input inputProvider;
     private final FileRepository<Client> clientRepository;
 
-    public ClientService(AppHelper<Client> appHelperClient, Input inputProvider) {
+    // Новый конструктор с инъекцией FileRepository<Client>
+    public ClientService(AppHelper<Client> appHelperClient, Input inputProvider, FileRepository<Client> clientRepository) {
         this.appHelperClient = appHelperClient;
         this.inputProvider = inputProvider;
-        this.clientRepository = new FileRepositoryImpl<>("clients.dat"); // Сохраняем в файл clients.dat
+        this.clientRepository = clientRepository;
+    }
+
+    // Существующий конструктор для производственного кода
+    public ClientService(AppHelper<Client> appHelperClient, Input inputProvider) {
+        this(appHelperClient, inputProvider, new FileRepositoryImpl<>("clients.dat"));
     }
 
     @Override
@@ -67,17 +74,16 @@ public class ClientService implements Service<Client> {
 
     @Override
     public boolean remove(Client entity) {
+        // Реализация удаления по объекту, если необходимо
         return false;
     }
 
     public void removeClient() {
         List<Client> clients = clientRepository.load();
-
         if (clients.isEmpty()) {
             System.out.println("Список клиентов пуст. Нечего удалять.");
             return;
         }
-
         appHelperClient.printList(clients);
 
         try {
@@ -89,10 +95,9 @@ public class ClientService implements Service<Client> {
                 return;
             }
 
-            Client clientToRemove = clients.get(index);
-            clients.remove(index);  // Удаление клиента
-            clientRepository.save(clients);  // Сохранение изменений
-            System.out.println("Клиент \"" + clientToRemove.getFirstname() + " " + clientToRemove.getLastname() + "\" успешно удален.");
+            clients.remove(index); // Удаляем клиента
+            clientRepository.save(clients); // Сохраняем изменения
+            System.out.println("Клиент успешно удален.");
         } catch (NumberFormatException e) {
             System.out.println("Ошибка: некорректный ввод числа.");
         }
